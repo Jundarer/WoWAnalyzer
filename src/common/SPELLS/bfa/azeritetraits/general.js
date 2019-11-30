@@ -365,5 +365,20 @@ export default {
     id: 303390,
     name: 'Undulating Tides',
     icon: 'ability_mage_waterjet',
+  },  
+  RELATIONAL_NORMALIZAIION_GIZMO: {
+    id: 280178,
+    name: 'Relational Normalization Gizmo',
+    icon: 'inv_misc_enggizmos_15',
+  },
+  RELATIONAL_NORMALIZAIION_GIZMO_HASTE: {
+    id: 280653,
+    name: 'Normalization Increase',
+    icon: 'inv_misc_enggizmos_15',
+  },
+  RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT: {
+    id: 280654,
+    name: 'Normalization Decrease',
+    icon: 'inv_misc_enggizmos_16',
   },
 };

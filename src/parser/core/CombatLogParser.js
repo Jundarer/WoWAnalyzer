@@ -137,6 +137,7 @@ import SwirlingSands from '../shared/modules/spells/bfa/azeritetraits/SwirlingSa
 import Tradewinds from '../shared/modules/spells/bfa/azeritetraits/Tradewinds';
 import TreacherousCovenant from '../shared/modules/spells/bfa/azeritetraits/TreacherousCovenant';
 import LoyalToTheEnd from '../shared/modules/spells/bfa/azeritetraits/LoyalToTheEnd';
+import RelationalNormalizationGizmo from '../shared/modules/spells/bfa/azeritetraits/RelationalNormalizationGizmo';
 
 // Essences
 import TheEverRisingTide from '../shared/modules/spells/bfa/essences/TheEverRisingTide';
@@ -325,6 +326,7 @@ class CombatLogParser {
     tradewinds: Tradewinds,
     treacherousCovenant: TreacherousCovenant,
     loyalToTheEnd: LoyalToTheEnd,
+	relationalNormalizationGizmo: RelationalNormalizationGizmo,
 
     // Essences
     theEverRisingTide: TheEverRisingTide,
