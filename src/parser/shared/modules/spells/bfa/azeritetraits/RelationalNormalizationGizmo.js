@@ -23,7 +23,7 @@ const relationalNormalizationGizmoStats = traits => Object.values(traits).reduce
  * Relational Normalization Gizmo
  * Your spells and abilities have a chance to grow or shrink the world. Shrinking the world grants you y primary stat and 26600 maximum health for 10 sec. Growing the world grants you x Haste and 25% movement speed for 10 sec.
  *
- * Example report: 
+ * Example report: https://www.warcraftlogs.com/reports/jzx21fbnMkDvYCBF#fight=19&type=auras&source=11
  */
 class RelationalNormalizationGizmo extends Analyzer {
   static dependencies = {
