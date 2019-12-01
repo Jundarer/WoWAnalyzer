@@ -6,17 +6,25 @@ import { calculateAzeriteEffects } from 'common/stats';
 import UptimeIcon from 'interface/icons/Uptime';
 import PrimaryStatIcon from 'interface/icons/PrimaryStat';
 import HasteIcon from 'interface/icons/Haste';
-import AzeritePowerStatistic from 'interface/statistics/AzeritePowerStatistic';
+import TraitStatisticBox, { STATISTIC_ORDER } from 'interface/others/TraitStatisticBox';
 import BoringSpellValueText from 'interface/statistics/components/BoringSpellValueText';
 import Analyzer from 'parser/core/Analyzer';
 import StatTracker from 'parser/shared/modules/StatTracker';
 
-const relationalNormalizationGizmoStats = traits => Object.values(traits).reduce((obj, rank) => {
-  const [stat] = calculateAzeriteEffects(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id, rank);
-  obj.stat += stat;
+const relationalNormalizationGizmoHaste = traits => Object.values(traits).reduce((obj, rank) => {
+  const [haste] = calculateAzeriteEffects(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id, rank);
+  obj.haste += haste;
   return obj;
 }, {
-  stat: 0,
+  haste: 0,
+});
+
+const relationalNormalizationGizmoPrimaryStat = traits => Object.values(traits).reduce((obj, rank) => {
+  const [primaryStat] = calculateAzeriteEffects(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id, rank);
+  obj.primaryStat += primaryStat;
+  return obj;
+}, {
+  primaryStat: 0,
 });
 
 /**
@@ -31,13 +39,14 @@ class RelationalNormalizationGizmo extends Analyzer {
   };
 
   
-  stat = 0;
+  haste = 0;
+  primaryStat = 0;
   hasteProcs = 0;
-  mainStatProcs = 0;
+  primaryStatProcs = 0;
   
   variousProcs = [
     SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id,
-    SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.id
+    SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.id
   ];
 
   constructor(...args) {
@@ -46,17 +55,21 @@ class RelationalNormalizationGizmo extends Analyzer {
     if (!this.active) {
       return;
     }
-
-    const { stat } = relationalNormalizationGizmoStats(this.selectedCombatant.traitsBySpellId[SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id]);
-    this.stat = stat;
+    
+	//const { haste } = relationalNormalizationGizmoHaste(this.selectedCombatant.traitsBySpellId[SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id]);
+    const { primaryStat } = relationalNormalizationGizmoPrimaryStat(this.selectedCombatant.traitsBySpellId[SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id]);
+    //this.haste = haste;
+	this.primaryStat = primaryStat;
+	const ranks = this.selectedCombatant.traitRanks(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id) || [];
+	this.haste=ranks.reduce((total,rank) => total + calculateAzeriteEffects(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id, rank)[0], 0);
 
     this.statTracker.add(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id, {
-      haste: stat,
+      haste: this.haste,
     });	
-	this.statTracker.add(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.id, {
-      strength: stat,
-      intellect: stat,
-      agility: stat,
+	this.statTracker.add(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.id, {
+      strength: this.primaryStat,
+      intellect: this.primaryStat,
+      agility: this.primaryStat,
     });
   }
 
@@ -74,8 +87,8 @@ class RelationalNormalizationGizmo extends Analyzer {
       return;
     }
 
-    if (event.ability.guid === SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.id) {
-      this.mainStatProcs += 1;
+    if (event.ability.guid === SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.id) {
+      this.primaryStatProcs += 1;
     }
   }
 
@@ -88,38 +101,32 @@ class RelationalNormalizationGizmo extends Analyzer {
   }
   
   get averageHaste() {
-    return (this.stat * this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id)).toFixed(0);
+    return (this.haste * this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id)).toFixed(0);
   }
-  get averageMainStat() {
-    return (this.stat * this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.id)).toFixed(0);
+  get averagePrimaryStat() {
+    return (this.primaryStat * this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.id)).toFixed(0);
   }
 
   statistic() {
     return (
-	  <AzeritePowerStatistic size="flexible">
-        <BoringSpellValueText
-          spell={SPELLS.RELATIONAL_NORMALIZAIION_GIZMO}
-          tooltip={(
-            <>
-              {SPELLS.ELEMENTAL_WHIRL.name} grants <strong>{this.stat}</strong> of a secondary stat while active.<br />
-              <ul>
-                <li>
-                  You procced {SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.name} <strong>{this.hasteProcs} {(this.hasteProcs > 1 || this.hasteProcs === 0) ? 'times' : 'time'}</strong>.
-                  ({formatPercentage(this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id))}% uptime)
-                </li>
-                <li>
-                  You procced {SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.name} <strong>{this.mainStatProcs} {(this.mainStatProcs > 1 || this.mainStatProcs === 0) ? 'times' : 'time'}</strong>.
-                  ({formatPercentage(this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT.id))}% uptime)
-                </li>
-              </ul>
-            </>
-          )}
-        >
-	      <UptimeIcon /> {formatPercentage(this.averageUptime, 0)}% <small>uptime</small><br />
-          <HasteIcon /> {formatNumber(this.averageHaste)} <small>average Haste gained</small><br />
-          <HasteIcon /> {formatNumber(this.averageMainStat)} <small>average Main Stat gained</small>
-        </BoringSpellValueText>
-      </AzeritePowerStatistic>
+      <TraitStatisticBox
+        position={STATISTIC_ORDER.OPTIONAL()}
+        trait={SPELLS.RELATIONAL_NORMALIZAIION_GIZMO.id}
+        value={(
+          <>
+            <PrimaryStatIcon stat={this.selectedCombatant.spec.primaryStat} /> {formatNumber(this.averagePrimaryStat)} <small>average Primary Stat gained</small><br />
+			<HasteIcon  /> {formatNumber(this.averageHaste)} <small> average Haste gained</small>
+          </>
+        )}
+        tooltip={(
+          <>
+            {SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.name} grants <strong>{this.haste} Haste</strong> while active.<br />
+            {SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.name} grants <strong>{this.primaryStat} Primary Stat</strong> while active.<br />
+            You procced <strong>{SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.name} {this.hasteProcs} times</strong> with an uptime of {formatPercentage(this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_HASTE.id))}%.<br />
+			You procced <strong>{SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.name} {this.primaryStatProcs} times</strong> with an uptime of {formatPercentage(this.uptime(SPELLS.RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT.id))}%.
+          </>
+        )}
+      />
     );
   }
 }

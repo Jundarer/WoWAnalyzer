@@ -376,7 +376,7 @@ export default {
     name: 'Normalization Increase',
     icon: 'inv_misc_enggizmos_15',
   },
-  RELATIONAL_NORMALIZAIION_GIZMO_MAIN_STAT: {
+  RELATIONAL_NORMALIZAIION_GIZMO_PRIMARY_STAT: {
     id: 280654,
     name: 'Normalization Decrease',
     icon: 'inv_misc_enggizmos_16',
